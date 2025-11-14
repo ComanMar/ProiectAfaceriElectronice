@@ -1,9 +1,10 @@
-// client/src/pages/ProdutsPage.jsx
+// client/src/pages/ProductsPage.jsx
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { fetchProducts, deleteProduct } from '../api/product.routes';
+import { addProductToOrder } from '../api/order.routes';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function ProductsPage() {
@@ -64,6 +65,30 @@ export default function ProductsPage() {
 
   const handleCreateClick = () => {
     navigate('/products/create');
+  };
+
+  const handleAddToOrder = async (productId, productStock) => {
+    try {
+      if (productStock < 1) {
+        toast.error('Stock épuizat');
+        return;
+      }
+
+      const response = await addProductToOrder(productId, 1);
+      if (response?.success) {
+        toast.success('Product added to order!');
+        // Reîncarcă produsele pentru a actualiza stocul
+        fetchProducts();
+      } else {
+        if (response?.message === 'Insufficient stock') {
+          toast.error('Stock épuizat');
+        } else {
+          toast.error(response?.message || 'Failed to add product');
+        }
+      }
+    } catch (error) {
+      toast.error('Error adding product to order');
+    }
   };
 
   if (loading) {
@@ -130,6 +155,17 @@ export default function ProductsPage() {
                 />
                 {isAdmin && (
                   <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                      <button
+                      type="button"
+                      className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-md shadow-lg transition-colors duration-200"
+                      onClick={() => handleAddToOrder(product.id, product.stock)}
+                      title="Add to Order"
+                      disabled={product.stock === 0}
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                    </button>
                     <button
                       type="button"
                       className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md shadow-lg transition-colors duration-200"

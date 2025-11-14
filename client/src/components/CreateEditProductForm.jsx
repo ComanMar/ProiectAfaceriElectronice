@@ -4,12 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import LoadingSpinner from './LoadingSpinner';
 
-/**
- * CreateEditProductForm - Reusable form for creating and editing products
- * @param {Object} product - Product data for edit mode (null for create mode)
- * @param {Function} onSubmit - Callback function that handles the form submission
- * @param {boolean} isLoading - Loading state
- */
 export default function CreateEditProductForm({ product = null, onSubmit, isLoading = false }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -83,10 +77,12 @@ export default function CreateEditProductForm({ product = null, onSubmit, isLoad
     return <LoadingSpinner />;
   }
 
+  const categories = ['Football', 'Basketball', 'Tennis', 'Volley', 'Hockey', 'Bowling', 'Other'];
+
   return (
     <div className="bg-white h-screen overflow-y-auto">
       <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900 mb-8 text-center">
           {product ? 'Edit Product' : 'Create New Product'}
         </h1>
 
@@ -149,22 +145,29 @@ export default function CreateEditProductForm({ product = null, onSubmit, isLoad
             </div>
           </div>
 
-          {/* Category */}
+          {/* Category Dropdown */}
           <div>
             <label htmlFor="category" className="block text-sm font-medium text-gray-700">
               Category *
             </label>
             <div className="mt-1">
-              <input
-                type="text"
+              <select
                 id="category"
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2"
-                placeholder="Enter category"
-              />
+                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2 bg-white"
+              >
+                <option value="" disabled>
+                  Select category
+                </option>
+                {categories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 

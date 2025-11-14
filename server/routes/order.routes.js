@@ -28,22 +28,31 @@ router.post('/add-product/:productId', verifyToken, async (req, res) => {
             return res.status(404).json({success: false, message: 'Product not found'});
         }
 
-        // Verifică stocul disponibil
+        let order = await Order.findOne({ where: { productId: parseInt(productId) } });
+
         if (product.stock < quantity) {
             return res.status(400).json({success: false, message: 'Insufficient stock'});
         }
 
-        // Crează comanda cu datele produsului
-        const order = await Order.create({
-            productId: parseInt(productId),
-            name: product.name,
-            description: product.description,
-            price: product.price,
-            image: product.image,
-            quantity: parseInt(quantity)
-        });
+        if (order) {
+            const newQuantity = order.quantity + quantity;
+            
+            if (product.stock < quantity) {
+                return res.status(400).json({success: false, message: 'Insufficient stock'});
+            }
 
-        // Actualizează stocul produsului (scade)
+            await order.update({ quantity: newQuantity });
+        } else {
+            order = await Order.create({
+                productId: parseInt(productId),
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                image: product.image,
+                quantity: parseInt(quantity)
+            });
+        }
+
         await product.decrement('stock', { by: quantity });
 
         res.status(201).json({success: true, message: 'Product added to orders', data: order});
