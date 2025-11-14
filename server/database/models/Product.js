@@ -39,11 +39,11 @@ const Product = sequelize.define('Product', {
     }
   },
   category: {
-    type: DataTypes.ENUM('Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Food', 'Other'),
+    type: DataTypes.ENUM('Football', 'Basketball', 'Tennis', 'Volley', 'Hockey', 'Bowling', 'Other'),
     allowNull: false,
     validate: {
       isIn: {
-        args: [['Electronics', 'Clothing', 'Books', 'Home', 'Sports', 'Food', 'Other']],
+        args: [['Football', 'Basketball', 'Tennis', 'Volley', 'Hockey', 'Bowling', 'Other']],
         msg: 'Category must be one of the predefined values'
       }
     }

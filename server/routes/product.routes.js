@@ -71,6 +71,30 @@ router.put('/:id', verifyToken, async (req, res) => {
     }
 })
 
+// ...existing code...
+
+router.post('/add-product/:productId', verifyToken, async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const quantity = req.body.quantity || 1;
+
+        if(isNaN(productId)) {
+            return res.status(400).json({success: false, message: 'Product id is not valid'});
+        }
+
+        const order = await Order.create({
+            productId: parseInt(productId),
+            quantity: parseInt(quantity)
+        });
+
+        res.status(201).json({success: true, message: 'Product added to orders', data: order});
+    } catch (error) {
+        res.status(500).json({success: false, message: 'Error adding product to orders', data: error.message});
+    }
+});
+
+///
+
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
         const id = req.params.id;
